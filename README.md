@@ -1,10 +1,14 @@
+# youtube-playlist-downloader
 
-# youtube-playliste-downloader
+**TUTORIEL :**
 
-TUTO : 
-
+```
 pip install -r requirements.txt
+```
 
+```
+python playlistdownloader.py
+```
 
-python palylistedownloader.py
+*(Si Chocolatey ne s'installe pas, veuillez essayer avec une invite de commande en tant qu'administrateur.)*
 

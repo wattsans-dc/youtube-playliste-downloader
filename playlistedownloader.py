@@ -1,5 +1,35 @@
 import os
 import subprocess
+import sys
+
+def install_choco():
+    try:
+        subprocess.run(["choco", "--version"], check=True)
+        print("Chocolatey est déjà installé.")
+    except FileNotFoundError:
+        print("Installation de Chocolatey...")
+        try:
+            powershell_command = [
+                "powershell",
+                "-command",
+                "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+            ]
+            subprocess.run(powershell_command, check=True)
+            print("Chocolatey installé avec succès.")
+        except subprocess.CalledProcessError as e:
+            print(f"Erreur lors de l'installation de Chocolatey : {e}")
+            sys.exit(1)
+        except Exception as e:
+            print(f"Erreur inattendue : {e}")
+            sys.exit(1)
+
+def install_ffmpeg():
+    try:
+        subprocess.run(["choco", "install", "-y", "ffmpeg"], check=True)
+        print("FFmpeg installé avec succès.")
+    except subprocess.CalledProcessError as e:
+        print(f"Erreur lors de l'installation de FFmpeg : {e}")
+        sys.exit(1)
 
 def download_audio(video_url, output_path):
     try:
@@ -15,45 +45,12 @@ def download_audio(video_url, output_path):
     except Exception as e:
         print(f"Erreur lors du téléchargement ou de la conversion en audio de {video_url}: {e}")
 
-def get_best_video_format(video_url):
-    try:
-        command = [
-            'yt-dlp',
-            '--get-best',
-            '--no-playlist',
-            '--format', 'best',
-            '--skip-download',
-            '--print-json',
-            video_url
-        ]
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
-        return result.stdout.strip()
-    except Exception as e:
-        print(f"Erreur lors de la récupération du meilleur format vidéo pour {video_url}: {e}")
-        return None
-
-def download_video(video_url, output_path):
-    try:
-        best_format_info = get_best_video_format(video_url)
-        if best_format_info:
-            best_format = best_format_info.split('\n')[-1]
-            command = [
-                'yt-dlp',
-                '-f', best_format.split()[0],
-                '-o', os.path.join(output_path, '%(title)s.%(ext)s'),
-                video_url
-            ]
-            subprocess.run(command, check=True)
-            print(f"Téléchargé en vidéo: {video_url}")
-    except Exception as e:
-        print(f"Erreur lors du téléchargement de la vidéo {video_url}: {e}")
-
 def download_playlist(playlist_url, output_path, download_type='audio'):
     try:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         
-        print(f"Téléchargement de la playlist: {playlist_url}")
+        print(f"Téléchargement de la playlist (ou video): {playlist_url}")
         
         if download_type == 'audio':
             command = [
@@ -74,18 +71,21 @@ def download_playlist(playlist_url, output_path, download_type='audio'):
         
         subprocess.run(command, check=True)
         
-        print(f"Téléchargement de la playlist terminé.")
+        print(f"Téléchargement de la playlist (ou de la video) terminé.")
     except Exception as e:
         print(f"Erreur lors du téléchargement de la playlist: {e}")
 
 def main():
     try:
+        install_choco()
+        install_ffmpeg()
+        
         playlist_url = input("Entrez l'URL de la playlist YouTube: ")
         output_path = "./playlist_downloads"
         download_type = input("Souhaitez-vous télécharger en 'audio' ou 'video'? ").lower()
         
         if download_type == 'audio':
-            download_audio(playlist_url, output_path)
+            download_playlist(playlist_url, output_path, 'audio')
         elif download_type == 'video':
             download_playlist(playlist_url, output_path, 'video')
         else:
