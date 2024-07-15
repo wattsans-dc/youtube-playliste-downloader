@@ -6,15 +6,15 @@ def download_audio(video_url, output_path):
     try:
         command = [
             'yt-dlp',
-            '-x', '--audio-format', 'mp3',
+            '-f', 'bestaudio',
             '-o', os.path.join(output_path, '%(title)s.%(ext)s'),
             video_url
         ]
         subprocess.run(command, check=True)
         
-        print(f"Téléchargé et converti en audio: {video_url}")
+        print(f"Téléchargé en audio: {video_url}")
     except Exception as e:
-        print(f"Erreur lors du téléchargement ou de la conversion en audio de {video_url}: {e}")
+        print(f"Erreur lors du téléchargement de l'audio de {video_url}: {e}")
 
 def download_playlist(playlist_url, output_path, download_type='audio'):
     try:
@@ -27,7 +27,7 @@ def download_playlist(playlist_url, output_path, download_type='audio'):
             command = [
                 'yt-dlp',
                 '--yes-playlist',
-                '-x', '--audio-format', 'mp3',
+                '-f', 'bestaudio',
                 '-o', os.path.join(output_path, '%(title)s.%(ext)s'),
                 playlist_url
             ]
