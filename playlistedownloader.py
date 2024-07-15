@@ -1,6 +1,5 @@
 import os
 import subprocess
-import sys
 
 def download_audio(video_url, output_path):
     try:
@@ -35,7 +34,7 @@ def download_playlist(playlist_url, output_path, download_type='audio'):
             command = [
                 'yt-dlp',
                 '--yes-playlist',
-                '--format', 'bestvideo+bestaudio/best',
+                '-f', 'best[ext=mp4]',
                 '-o', os.path.join(output_path, '%(title)s.%(ext)s'),
                 playlist_url
             ]
