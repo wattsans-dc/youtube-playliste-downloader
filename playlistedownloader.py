@@ -2,35 +2,6 @@ import os
 import subprocess
 import sys
 
-def install_choco():
-    try:
-        subprocess.run(["choco", "--version"], check=True)
-        print("Chocolatey est déjà installé.")
-    except FileNotFoundError:
-        print("Installation de Chocolatey...")
-        try:
-            powershell_command = [
-                "powershell",
-                "-command",
-                "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-            ]
-            subprocess.run(powershell_command, check=True)
-            print("Chocolatey installé avec succès.")
-        except subprocess.CalledProcessError as e:
-            print(f"Erreur lors de l'installation de Chocolatey : {e}")
-            sys.exit(1)
-        except Exception as e:
-            print(f"Erreur inattendue : {e}")
-            sys.exit(1)
-
-def install_ffmpeg():
-    try:
-        subprocess.run(["choco", "install", "-y", "ffmpeg"], check=True)
-        print("FFmpeg installé avec succès.")
-    except subprocess.CalledProcessError as e:
-        print(f"Erreur lors de l'installation de FFmpeg : {e}")
-        sys.exit(1)
-
 def download_audio(video_url, output_path):
     try:
         command = [
@@ -77,9 +48,6 @@ def download_playlist(playlist_url, output_path, download_type='audio'):
 
 def main():
     try:
-        install_choco()
-        install_ffmpeg()
-        
         playlist_url = input("Entrez l'URL de la playlist YouTube: ")
         output_path = "./playlist_downloads"
         download_type = input("Souhaitez-vous télécharger en 'audio' ou 'video'? ").lower()
